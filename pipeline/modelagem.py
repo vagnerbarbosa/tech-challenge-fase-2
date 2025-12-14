@@ -28,9 +28,9 @@ def otimizar_modelo_ag(X_treino, y_treino, nome_modelo='LightGBM Otimizado (AG)'
         'learning_rate': 0.08,
         'subsample': 0.7, 
         'colsample_bytree': 0.7,
-        'class_weight': 'balanced', # Para priorizar o Recall (Sensibilidade)
+        'class_weight': 'balanced',
         'random_state': 42,
-        'verbose': -1 # Silenciar o output
+        'verbose': -1 
     }
     
     melhor_modelo = lgb.LGBMClassifier(**params_otimizados)
@@ -39,12 +39,6 @@ def otimizar_modelo_ag(X_treino, y_treino, nome_modelo='LightGBM Otimizado (AG)'
     print(f"--- ✅ Otimização Concluída. Modelo {nome_modelo} treinado. ---")
     
     return melhor_modelo, nome_modelo
-
-# A função treinar_modelos permanece a mesma
-# def treinar_modelos(modelos, X_treino, y_treino):
-#     for modelo in modelos.values():
-#         modelo.fit(X_treino, y_treino)
-#     return modelos
 
 def treinar_modelos(modelos, X_treino, y_treino):
     for modelo in modelos.values():
