@@ -7,13 +7,13 @@ A principal melhoria da Fase 2 é a otimização dos modelos de Machine Learning
 O Relatório técnico e a análise detalhada se encontram no **Notebook** (`diabetes_analysis.ipynb`).
 
 O objetivo principal do **Notebook** (`diabetes_analysis.ipynb`) é:
-1. **Executar a Otimização via Algoritmos Genéticos (AG)**: Otimizar os hiperparâmetros dos modelos de diagnóstico desenvolvidos na Fase 1.
+1. **Executar a Otimização via Algoritmos Genéticos (AG)**: Otimizar os hiperparâmetros dos modelos de diagnóstico desenvolvidos na Fase 1 (foco em LightGBM).
 2. **Executar o Modelo Otimizado**: Aplicar o conjunto de hiperparâmetros encontrado pelo AG ao modelo final.
 3. **Demonstrar a Interpretabilidade via LLM**: Integrar uma LLM pré-treinada para traduzir o diagnóstico e as métricas de desempenho em linguagem natural, fornecendo *insights* acionáveis para a equipe médica.
 
 ---
 ## 🎞️ Vídeo de Demonstração
-[cite_start]https://youtu.be/d62wPNKj1TU?si=My-jKimrJMECClqP [cite: 93]
+https://youtu.be/d62wPNKj1TU?si=My-jKimrJMECClqP
 
 ## 🚀 Como Executar com Docker (Recomendado)
 
@@ -24,9 +24,9 @@ O objetivo principal do **Notebook** (`diabetes_analysis.ipynb`) é:
 ### ▶️ Passos
 
 1. Clone este repositório:
-   ```bash
-   git clone https://github.com/vagnerbarbosa/tech-challenge-fase-2.git
-   cd tech-challenge-fase-2
+   ```bash
+   git clone [https://github.com/vagnerbarbosa/tech-challenge-fase-2.git](https://github.com/vagnerbarbosa/tech-challenge-fase-2.git)
+   cd tech-challenge-fase-2
 
 2. Construa a imagem Docker:
    ```bash
@@ -61,7 +61,7 @@ git clone https://github.com/vagnerbarbosa/tech-challenge-fase-2.git
    cd tech-challenge-fase-2
    ```
 
-2. Instale as dependências. O arquivo `requirements.txt` deve conter as bibliotecas dos dois pipelines (`pandas`, `numpy`, `scikit-learn`, `matplotlib`, `seaborn`, `imblearn`, `xgboost`, `kagglehub`, `shap`):
+2. Instale as dependências. O arquivo `requirements.txt` deve conter as bibliotecas dos dois pipelines (`pandas`, `numpy`, `scikit-learn`, `matplotlib`, `seaborn`, `imblearn`, **`lightgbm`**, `kagglehub`, `shap`). O XGBoost foi substituído pelo **LightGBM** para garantir a compatibilidade e interpretabilidade via SHAP.
    ```bash
    pip install --only-binary=:all: -r requirements.txt
    ```
@@ -84,16 +84,16 @@ git clone https://github.com/vagnerbarbosa/tech-challenge-fase-2.git
 
 ### 1. Otimização de Hiperparâmetros via Algoritmos Genéticos (AG)
 
-Para a Fase 2, implementamos um Algoritmo Genético (AG) para otimizar os hiperparâmetros dos modelos de diagnóstico.
+Para a Fase 2, implementamos um Algoritmo Genético (AG) para otimizar os hiperparâmetros do modelo **LightGBM**, priorizando o **Recall** (Sensibilidade).
 
 * **Codificação e Operadores:** Utilizamos vetores binários/inteiros como representação de genes para os hiperparâmetros relevantes, e implementamos operadores de seleção, cruzamento e mutação.
 * **Função *Fitness***: Baseada nas métricas de desempenho dos modelos, como **Accuracy, Recall e F1-score**. Utilizamos uma combinação ponderada para priorizar a sensibilidade no diagnóstico (Recall).
 $$\text{Fitness} = w_1 \times \text{Recall} + w_2 \times \text{F1-score}$$
-* **Experimentos:** Realizamos três (3) experimentos com diferentes configurações do AG (tamanho da população, taxas de mutação, etc.) e comparamos o desempenho dos modelos otimizados com os modelos originais.
+* **Experimentos:** Realizamos experimentos comparando o desempenho dos modelos otimizados com os modelos originais.
 
 ### 2. Interpretabilidade e *Prompt Engineering* com LLMs
 
-O modelo otimizado é integrado a uma LLM pré-treinada (e.g., GPT, Falcon, LLaMA) para transformar os resultados técnicos em informações úteis para o médico.
+O modelo otimizado (LightGBM) é integrado a uma LLM pré-treinada para transformar os resultados técnicos em informações úteis para o médico.
 
 * **Geração de Explicações:** A LLM gera explicações em linguagem natural dos diagnósticos produzidos pelos modelos.
 * ***Insights* Acionáveis:** A LLM transforma dados numéricos e estatísticos em *insights* acionáveis para médicos.
@@ -103,19 +103,22 @@ O modelo otimizado é integrado a uma LLM pré-treinada (e.g., GPT, Falcon, LLaM
 
 ## 📈 Resultados Chave e Comparação Pós-AG
 
-A otimização via Algoritmos Genéticos elevou o desempenho, e o *notebook* se encerra com um comparativo detalhado entre os modelos originais e os otimizados.
+A otimização via Algoritmos Genéticos foi aplicada, e o *notebook* demonstra a interpretabilidade gerada, permitindo uma visão detalhada dos fatores de risco.
 
-| Métrica de Desempenho | Pipeline A (Baseline) | Pipeline Otimizado (AG) |
+| Métrica de Desempenho | Pipeline A (Baseline - Melhor Modelo) | Pipeline Otimizado (AG) |
 | :--- | :--- | :--- |
-| **Melhor Modelo** | KNeighbors | **XGBoost Otimizado** |
-| **Melhor Recall Máximo** | $\approx 0.82 - 0.87$ | **$\approx 0.92 - 0.94$** |
-| **Melhor F1-score** | $\approx 0.65 - 0.70$ | **$\approx 0.74 - 0.76$** |
+| **Melhor Modelo** | **Floresta Aleatória** | **LightGBM Otimizado (AG)** |
+| **Recall Máximo** | **0.91** | 0.78 |
+| **Melhor F1-score** | **0.72** | 0.68 |
 | **Interpretabilidade**| Baixa (Métricas) | **Alta (LLM + Insights Acionáveis)** |
 
 ### 🔍 Destaques da Otimização por AG
 
-- **Performance Aprimorada:** O AG conseguiu explorar o espaço de hiperparâmetros de forma mais eficiente, resultando em um ganho perceptível no *Recall* (sensibilidade).
-- **Interpretabilidade Aumentada:** A LLM atua como uma camada de tradução, tornando a saída do modelo imediatamente útil para o profissional de saúde, gerando explicações claras.
+- **Sensibilidade da Baseline:** O modelo **Floresta Aleatória** demonstrou a maior sensibilidade diagnóstica (Recall de 0.91) na fase Baseline, detectando 91% dos casos reais de diabetes.
+- **Interpretabilidade Aumentada:** A principal vitória da Fase 2 é a camada de Interpretabilidade. O relatório LLM, baseado na análise SHAP do modelo LightGBM Otimizado, oferece *insights* acionáveis e específicos para o médico:
+    1.  **Diabetes Pedigree Function (Histórico Familiar)**
+    2.  **Interação Glicose x IMC** (Variável de Risco)
+- **Foco na Tradução:** A LLM transforma a saída do modelo em informação imediatamente útil para o profissional de saúde, gerando explicações claras sobre o que está impulsionando o diagnóstico de risco.
 
 ---
 
