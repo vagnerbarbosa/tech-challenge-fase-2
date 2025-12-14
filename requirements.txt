@@ -8,3 +8,4 @@ jupyter==1.0.0
 lightgbm
 imbalanced-learn
 kagglehub
+google-genai
