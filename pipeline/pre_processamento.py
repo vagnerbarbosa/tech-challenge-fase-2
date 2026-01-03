@@ -1,25 +1,9 @@
 import pandas as pd
+from pathlib import Path
+import kagglehub
 import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import RobustScaler
-
-import pandas as pd
-import numpy as np
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import RobustScaler
-from pathlib import Path
-import kagglehub
-
-from pathlib import Path
-import pandas as pd
-import kagglehub
-
-from pathlib import Path
-import pandas as pd
-import kagglehub
-
-from pathlib import Path
-import pandas as pd
 
 def carregar_dados() -> pd.DataFrame:
     '''
@@ -33,7 +17,6 @@ def carregar_dados() -> pd.DataFrame:
     except Exception as e:
         print(f"Arquivo local não encontrado ou erro ao ler: {e}")
         try:
-            import kagglehub
             endereco_de_origem = kagglehub.dataset_download(handle='uciml/pima-indians-diabetes', force_download=True)
             diretorio_de_origem = Path(endereco_de_origem).resolve()
             lista_dados_csv = []
