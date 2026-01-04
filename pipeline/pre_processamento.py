@@ -2,24 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import RobustScaler
-
-import pandas as pd
-import numpy as np
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import RobustScaler
 from pathlib import Path
 import kagglehub
-
-from pathlib import Path
-import pandas as pd
-import kagglehub
-
-from pathlib import Path
-import pandas as pd
-import kagglehub
-
-from pathlib import Path
-import pandas as pd
 
 def carregar_dados() -> pd.DataFrame:
     '''
