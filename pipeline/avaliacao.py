@@ -3,22 +3,29 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 import pandas as pd
-import numpy as np 
-import lightgbm as lgb # Importado para garantir reconhecimento de classe (LGBMClassifier)
+import numpy as np
 
 # === INTEGRAÇÃO GEMINI ===
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 try:
     from google import genai
     from google.genai import types
-    # Tenta configurar o cliente Gemini
-    client = genai.Client()
-    MODELO_LLM = "gemini-2.5-flash"
-    CHAMADA_LLM_ATIVA = True
-    print("✅ Gemini Client configurado. Chamadas à API ativas.")
+
+    api_key = os.getenv('GEMINI_API_KEY')
+    if api_key:
+        client = genai.Client(api_key=api_key)
+        MODELO_LLM = "gemini-2.5-flash-lite"
+        CHAMADA_LLM_ATIVA = True
+        print("✅ Gemini Client configurado. Chamadas à API ativas.")
+    else:
+        raise ValueError("GEMINI_API_KEY não encontrada")
 except Exception as e:
     CHAMADA_LLM_ATIVA = False
-    print("⚠️ Alerta: Gemini API não configurada (variável GEMINI_API_KEY ausente ou erro de biblioteca). Usando modo de SIMULAÇÃO LLM.")
+    print(f"⚠️ Alerta: Gemini API não configurada ({e}). Usando modo de SIMULAÇÃO LLM.")
 # ==========================
 
 # --- Funções Auxiliares para Simulação (Fallback) ---

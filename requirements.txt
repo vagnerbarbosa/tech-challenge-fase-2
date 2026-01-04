@@ -11,3 +11,5 @@ lightgbm
 imbalanced-learn
 kagglehub
 google-genai
+python-dotenv
+deap

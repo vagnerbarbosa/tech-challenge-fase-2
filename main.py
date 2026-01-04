@@ -43,28 +43,27 @@ def principal():
     # FASE 2: OTIMIZAÇÃO POR AG E INTERPRETAÇÃO LLM
     # ==========================================================
     print("\n\n=== 🧬 FASE 2: OTIMIZAÇÃO POR ALGORITMOS GENÉTICOS (AG) ===")
-    
-    # 5. Otimização e Treinamento do Modelo Otimizado (Simulação AG)
-    melhor_modelo_otimizado, nome_modelo_otimizado = modelagem.otimizar_modelo_ag(
+
+    # 5. Otimização e Treinamento do Random Forest Otimizado (AG Real + Limiar Otimizado)
+    melhor_modelo_otimizado, nome_modelo_otimizado, limiar_otimizado = modelagem.otimizar_random_forest_ag(
         X_treino_res, y_treino_res
     )
 
-    # 6. Avaliação do Modelo Otimizado
-    # Avaliamos o modelo otimizado separadamente para mostrar o ganho de performance
+    # 6. Avaliação do Modelo Otimizado com limiar otimizado pelo AG
     modelos_otimizados = {nome_modelo_otimizado: melhor_modelo_otimizado}
     nome_melhor_otimizado, modelo_otimizado = avaliacao.avaliar_modelos(
-        modelos_otimizados, X_teste, y_teste, nomes_features
+        modelos_otimizados, X_teste, y_teste, nomes_features, limiar=limiar_otimizado
     )
 
     # 7. Interpretação do Modelo Otimizado (SHAP)
     print(f"\n--- 🔎 INTERPRETAÇÃO DO MODELO OTIMIZADO ({nome_melhor_otimizado}) ---")
     avaliacao.interpretar_melhor_modelo(modelo_otimizado, X_teste_df, nomes_features)
-    
+
     # 8. Geração de Explicação Acionável via LLM
     avaliacao.gerar_explicacao_llm(
-        modelo_otimizado, nome_melhor_otimizado, X_teste_df, y_teste, nomes_features
+        modelo_otimizado, nome_melhor_otimizado, X_teste_df, y_teste, nomes_features, limiar=limiar_otimizado
     )
-    
+
     print("\nPipeline Otimizado por AG e com Interpretabilidade LLM CONCLUÍDO.")
 
 
