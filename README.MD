@@ -111,7 +111,7 @@ A otimização via Algoritmos Genéticos foi aplicada com sucesso, demonstrando 
 
 ### 📊 Evolução do AG
 
-O AG convergiu em 30 gerações, com o Recall médio da população evoluindo de **0.91** (geração 0) para **0.99** (geração 30), demonstrando a eficácia da otimização.
+O AG convergiu em 30 gerações, com o Recall médio da população evoluindo de **0.91** (geração 0) para **0.94** (geração 30), demonstrando a eficácia da otimização.
 
 ---
 
