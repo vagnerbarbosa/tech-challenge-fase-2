@@ -66,7 +66,14 @@ https://youtu.be/d62wPNKj1TU?si=My-jKimrJMECClqP
 
 ### 1. Otimização de Hiperparâmetros via Algoritmos Genéticos (AG)
 
-Para a Fase 2, implementamos um Algoritmo Genético (AG) **real** usando a biblioteca **DEAP** para otimizar os hiperparâmetros do modelo **Random Forest** e o **limiar de classificação**, priorizando o **Recall** (Sensibilidade).
+Para a Fase 2, implementamos um Algoritmo Genético (AG) usando a biblioteca **DEAP** (Distributed Evolutionary Algorithms in Python) para otimizar os hiperparâmetros do modelo **Random Forest** e o **limiar de classificação**, priorizando o **Recall** (Sensibilidade).
+
+**DEAP** é uma biblioteca Python especializada em algoritmos evolutivos que fornece:
+- ✅ **Algoritmos Genéticos completos** - População, seleção, crossover, mutação
+- ✅ **Operadores genéticos prontos** - cxTwoPoint, mutGaussian, selTournament, etc.
+- ✅ **Fitness customizável** - Maximização ou minimização de objetivos
+- ✅ **Algoritmos evolutivos** - eaSimple, eaMuPlusLambda, eaMuCommaLambda
+- ✅ **Estatísticas e logging** - Acompanhamento da evolução ao longo das gerações
 
 * **Codificação e Operadores:** Utilizamos vetores numéricos como representação de genes para os hiperparâmetros relevantes (`n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`, `max_features`, `bootstrap`) e o **limiar de classificação** (threshold).
 * **Função *Fitness***: Baseada no **Recall médio** obtido via validação cruzada estratificada (3-fold), aplicando o limiar otimizado em cada fold.
