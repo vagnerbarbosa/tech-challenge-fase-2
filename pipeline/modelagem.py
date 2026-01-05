@@ -2,22 +2,40 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
+import random
 
-def obter_modelos():
-    """
-    Cria e retorna um dicionário com modelos de classificação configurados para melhor recall.
-    """
-    return {
-        'Regressão Logística': LogisticRegression(class_weight='balanced', random_state=42),
-        'Árvore de Decisão': DecisionTreeClassifier(class_weight='balanced', random_state=42),
-        'Floresta Aleatória': RandomForestClassifier(class_weight='balanced', n_estimators=100, random_state=42),
-        'XGBoost': xgb.XGBClassifier(scale_pos_weight=1, eval_metric='logloss', random_state=42)
-    }
+intervalos_regressao_logistica = {
+    "C": lambda: random.uniform(0.001, 100),
+    "solver": lambda: random.choice(["lbfgs", "liblinear"]),
+    "max_iter": lambda: random.randint(100, 1000)
+}
 
-def treinar_modelos(modelos, X_treino, y_treino):
-    """
-    Treina N modelos e os retorna treinados.
-    """
-    for modelo in modelos.values():
-        modelo.fit(X_treino, y_treino)
-    return modelos
+intervalos_arvore_de_descisao = {
+    "max_depth": lambda: random.randint(2, 30),
+    "min_samples_split": lambda: random.randint(2, 20),
+    "min_samples_leaf": lambda: random.randint(1, 20),
+    "criterion": lambda: random.choice(["gini", "entropy"])
+}
+
+intervalos_arvore_aleatoria = {
+    "n_estimators": lambda: random.randint(50, 300),
+    "max_depth": lambda: random.randint(3, 30),
+    "min_samples_split": lambda: random.randint(2, 20),
+    "min_samples_leaf": lambda: random.randint(1, 20),
+    "max_features": lambda: random.uniform(0.1, 1.0)
+}
+
+intervalos_xgb = {
+    "n_estimators": lambda: random.randint(50, 300),
+    "max_depth": lambda: random.randint(3, 10),
+    "learning_rate": lambda: random.uniform(0.01, 0.3),
+    "subsample": lambda: random.uniform(0.5, 1.0),
+    "colsample_bytree": lambda: random.uniform(0.5, 1.0)
+}
+
+modelos = {
+    # "LogisticRegression": (LogisticRegression, intervalos_regressao_logistica),
+    "DecisionTree": (DecisionTreeClassifier, intervalos_arvore_de_descisao)#,
+    # "RandomForest": (RandomForestClassifier, intervalos_arvore_aleatoria),
+    # "XGBoost": (xgb.XGBClassifier, intervalos_xgb)
+}

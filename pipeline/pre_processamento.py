@@ -57,9 +57,7 @@ def pre_processar_dados_diabetes(df):
     X = df.drop('Outcome', axis=1)
     y = df['Outcome'].values
 
-    nomes_features = X.columns.tolist()
-
     # 5. Escalonamento
     scaler = RobustScaler()
     X_escalado = scaler.fit_transform(X)
-    return df, X_escalado, y, scaler, nomes_features
+    return X_escalado, y
