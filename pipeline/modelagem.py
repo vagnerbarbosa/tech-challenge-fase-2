@@ -34,8 +34,8 @@ intervalos_xgb = {
 }
 
 modelos = {
-    # "LogisticRegression": (LogisticRegression, intervalos_regressao_logistica),
-    "DecisionTree": (DecisionTreeClassifier, intervalos_arvore_de_descisao)#,
-    # "RandomForest": (RandomForestClassifier, intervalos_arvore_aleatoria),
-    # "XGBoost": (xgb.XGBClassifier, intervalos_xgb)
+    "LogisticRegression": (LogisticRegression, intervalos_regressao_logistica),
+    "DecisionTree": (DecisionTreeClassifier, intervalos_arvore_de_descisao),
+    "RandomForest": (RandomForestClassifier, intervalos_arvore_aleatoria),
+    "XGBoost": (xgb.XGBClassifier, intervalos_xgb)
 }

@@ -1,11 +1,11 @@
 from sklearn.model_selection import cross_val_score
 
+SEMENTE = 42
+
 def extrair_parametros(individuo, intervalos):
     return dict(zip(intervalos.keys(), individuo))
 
 def avaliar_modelo(classe_modelo, X, y, individuo = None, intervalos = None):
-
-    SEMENTE = 42
 
     if individuo is None:
         modelo = classe_modelo(random_state=SEMENTE)
