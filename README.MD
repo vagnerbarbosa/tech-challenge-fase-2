@@ -48,10 +48,12 @@ https://youtu.be/d62wPNKj1TU?si=My-jKimrJMECClqP
 
 5. Execute o pipeline:
    ```bash
-   python main.py
+   jupyter notebook diabetes_analysis.ipynb
    ```
 
 > **Nota**: O pipeline executa automaticamente a Fase 1 (Baseline) e a Fase 2 (Otimização por AG + Interpretabilidade LLM).
+
+> **Nota 2**: Certifique-se de que o Jupyter esteja configurado no PATH do sistema operacional para o comando funcionar corretamente.
 
 ---
 
