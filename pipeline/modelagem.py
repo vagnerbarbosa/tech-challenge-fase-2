@@ -8,6 +8,8 @@ import numpy as np
 import random
 from deap import base, creator, tools, algorithms
 
+
+
 def obter_modelos_baseline():
     """
     Cria e retorna um dicionário com modelos de classificação BASELINE.
@@ -23,9 +25,112 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     """
     Otimiza hiperparâmetros do Random Forest + LIMIAR usando Algoritmo Genético (DEAP).
     Foco em maximizar o Recall (Sensibilidade).
+    
+    COMPATIBILIDADE: Mantida para backward compatibility. 
+    Use executar_experimentos_ag() para múltiplos experimentos.
     """
-    print(f"\n--- 🧬 Iniciando Otimização REAL via AG para {nome_modelo} (com Limiar Otimizado) ---")
-    print(f"Gerações: {geracoes} | População: {populacao}")
+    modelo, nome, limiar, recall_cv = otimizar_random_forest_ag_customizado(
+        X_treino, y_treino, nome_modelo, geracoes, populacao
+    )
+    return modelo, nome, limiar
+
+def treinar_modelos(modelos, X_treino, y_treino):
+    for modelo in modelos.values():
+        modelo.fit(X_treino, y_treino)
+    return modelos
+
+def executar_experimentos_ag(X_treino, y_treino, experimentos_configs):
+    """
+    Executa múltiplos experimentos com diferentes configurações do AG.
+    
+    Args:
+        X_treino: Dados de treino
+        y_treino: Labels de treino
+        experimentos_configs: Lista de dicionários com configurações de cada experimento
+            Exemplo: [
+                {'nome': 'Exp1', 'geracoes': 20, 'populacao': 30, 'cxpb': 0.7, 'mutpb': 0.2},
+                {'nome': 'Exp2', 'geracoes': 30, 'populacao': 50, 'cxpb': 0.8, 'mutpb': 0.3},
+                ...
+            ]
+    
+    Returns:
+        Lista de dicionários com resultados de cada experimento
+    """
+    resultados = []
+    
+    print("="*80)
+    print("🧬 INICIANDO MÚLTIPLOS EXPERIMENTOS COM ALGORITMO GENÉTICO")
+    print("="*80)
+    
+    for i, config in enumerate(experimentos_configs, 1):
+        print(f"\n{'='*80}")
+        print(f"📊 EXPERIMENTO {i}/{len(experimentos_configs)}: {config['nome']}")
+        print(f"{'='*80}")
+        print(f"Configurações:")
+        print(f"  - Gerações: {config['geracoes']}")
+        print(f"  - População: {config['populacao']}")
+        print(f"  - Taxa de Cruzamento (cxpb): {config.get('cxpb', 0.7)}")
+        print(f"  - Taxa de Mutação (mutpb): {config.get('mutpb', 0.2)}")
+        print(f"  - Torneio: {config.get('tournsize', 3)}")
+        print(f"  - Probabilidade de Mutação Individual (indpb): {config.get('indpb', 0.3)}")
+        
+        # Executar otimização com configuração customizada
+        modelo, nome, limiar, recall_cv = otimizar_random_forest_ag_customizado(
+            X_treino, 
+            y_treino,
+            nome_modelo=config['nome'],
+            geracoes=config['geracoes'],
+            populacao=config['populacao'],
+            cxpb=config.get('cxpb', 0.7),
+            mutpb=config.get('mutpb', 0.2),
+            tournsize=config.get('tournsize', 3),
+            indpb=config.get('indpb', 0.3)
+        )
+        
+        resultado = {
+            'experimento': config['nome'],
+            'configuracao': config,
+            'modelo': modelo,
+            'limiar': limiar,
+            'recall_cv': recall_cv
+        }
+        resultados.append(resultado)
+        
+        print(f"\n✅ {config['nome']} Concluído - Recall CV: {recall_cv:.4f} | Limiar: {limiar:.4f}")
+    
+    print(f"\n{'='*80}")
+    print("📊 RESUMO DE TODOS OS EXPERIMENTOS")
+    print(f"{'='*80}")
+    print(f"{'Experimento':<25} {'Recall (CV)':<15} {'Limiar':<10} {'Gerações':<12} {'População':<12}")
+    print("-"*80)
+    for r in resultados:
+        print(f"{r['experimento']:<25} {r['recall_cv']:<15.4f} {r['limiar']:<10.4f} "
+              f"{r['configuracao']['geracoes']:<12} {r['configuracao']['populacao']:<12}")
+    
+    # Identificar o melhor experimento
+    melhor_exp = max(resultados, key=lambda x: x['recall_cv'])
+    print(f"\n🏆 MELHOR EXPERIMENTO: {melhor_exp['experimento']} com Recall CV = {melhor_exp['recall_cv']:.4f}")
+    print(f"{'='*80}\n")
+    
+    return resultados, melhor_exp
+
+def otimizar_random_forest_ag_customizado(X_treino, y_treino, nome_modelo='Random Forest Otimizado (AG)', 
+                                          geracoes=30, populacao=50, cxpb=0.7, mutpb=0.2, 
+                                          tournsize=3, indpb=0.3):
+    """
+    Versão customizável da otimização AG que aceita parâmetros do algoritmo genético.
+    
+    Args:
+        cxpb: Probabilidade de cruzamento
+        mutpb: Probabilidade de mutação
+        tournsize: Tamanho do torneio para seleção
+        indpb: Probabilidade de mutação individual de cada gene
+    
+    Returns:
+        modelo, nome_modelo, limiar_otimizado, recall_cv
+    """
+    print(f"\n--- 🧬 Iniciando Otimização via AG: {nome_modelo} ---")
+    print(f"Parâmetros AG: Gerações={geracoes}, População={populacao}, Cruzamento={cxpb}, Mutação={mutpb}")
 
     if hasattr(creator, "FitnessMax"):
         del creator.FitnessMax
@@ -53,10 +158,6 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     def avaliar_individuo(individual):
-        """
-        Função fitness: Avalia um conjunto de hiperparâmetros + limiar.
-        Retorna o Recall médio via validação cruzada (3-fold).
-        """
         n_estimators = max(50, min(500, int(individual[0])))
         max_depth = max(5, min(30, int(individual[1])))
         min_samples_split = max(2, min(20, int(individual[2])))
@@ -78,7 +179,6 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
                 n_jobs=-1
             )
 
-            from sklearn.model_selection import StratifiedKFold
             skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
             recalls = []
 
@@ -102,10 +202,9 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     toolbox.register("evaluate", avaliar_individuo)
     toolbox.register("mate", tools.cxTwoPoint)
 
-    def mutacao_customizada(individual, indpb):
-        """Mutação com limites para evitar valores inválidos"""
+    def mutacao_customizada(individual, indpb_param):
         for i in range(len(individual)):
-            if random.random() < indpb:
+            if random.random() < indpb_param:
                 if i == 0:
                     individual[i] += random.gauss(0, 50)
                 elif i == 1:
@@ -122,8 +221,8 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
                     individual[i] += random.gauss(0, 0.05)
         return (individual,)
 
-    toolbox.register("mutate", mutacao_customizada, indpb=0.3)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("mutate", mutacao_customizada, indpb_param=indpb)
+    toolbox.register("select", tools.selTournament, tournsize=tournsize)
 
     random.seed(42)
     np.random.seed(42)
@@ -137,7 +236,7 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     stats.register("min", np.min)
 
     print("\n🔬 Evolução do AG:")
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.7, mutpb=0.2,
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=cxpb, mutpb=mutpb,
                                      ngen=geracoes, stats=stats,
                                      halloffame=hof, verbose=True)
 
@@ -156,8 +255,9 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     }
 
     limiar_otimizado = max(0.2, min(0.5, melhor_individuo[6]))
+    recall_cv = melhor_individuo.fitness.values[0]
 
-    print(f"\n✅ Melhor Recall (CV): {melhor_individuo.fitness.values[0]:.4f}")
+    print(f"\n✅ Melhor Recall (CV): {recall_cv:.4f}")
     print(f"🎯 Limiar Otimizado: {limiar_otimizado:.4f}")
     print(f"🧬 Hiperparâmetros Otimizados:")
     for param, valor in params_otimizados.items():
@@ -167,11 +267,6 @@ def otimizar_random_forest_ag(X_treino, y_treino, nome_modelo='Random Forest Oti
     melhor_modelo = RandomForestClassifier(**params_otimizados)
     melhor_modelo.fit(X_treino, y_treino)
 
-    print(f"\n--- ✅ Otimização AG Concluída. Modelo {nome_modelo} treinado. ---")
+    print(f"\n--- ✅ Otimização AG Concluída ---")
 
-    return melhor_modelo, nome_modelo, limiar_otimizado
-
-def treinar_modelos(modelos, X_treino, y_treino):
-    for modelo in modelos.values():
-        modelo.fit(X_treino, y_treino)
-    return modelos
+    return melhor_modelo, nome_modelo, limiar_otimizado, recall_cv
