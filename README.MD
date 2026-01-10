@@ -130,10 +130,10 @@ O AG convergiu em 30 gerações, com o Recall médio da população evoluindo de
 tech-challenge-fase-2/
 ├── main.py                      # Pipeline principal (Fase 1 + Fase 2)
 ├── pipeline/
-│   ├── pre_processamento.py      # Carregamento e pré-processamento dos dados
+│   ├── pre_processamento.py     # Carregamento e pré-processamento dos dados
 │   ├── modelagem.py             # Modelos baseline + AG otimização
 │   └── avaliacao.py             # Avaliação, SHAP e integração LLM
-│   └── visualizacao.py             # Avaliação, SHAP e integração LLM
+│   └── visualizacao.py          # Avaliação, SHAP e integração LLM
 ├── requirements.txt             # Dependências (incluindo DEAP e python-dotenv)
 ├── .env                         # Chave da API Gemini
 ├── diabetes_analysis.ipynb      # Notebook de análise
