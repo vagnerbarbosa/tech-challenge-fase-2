@@ -133,7 +133,7 @@ tech-challenge-fase-2/
 │   ├── pre_processamento.py     # Carregamento e pré-processamento dos dados
 │   ├── modelagem.py             # Modelos baseline + AG otimização
 │   └── avaliacao.py             # Avaliação, SHAP e integração LLM
-│   └── visualizacao.py          # Avaliação, SHAP e integração LLM
+│   └── visualizacao.py          # Visualização de Gráficos
 ├── requirements.txt             # Dependências (incluindo DEAP e python-dotenv)
 ├── .env                         # Chave da API Gemini
 ├── diabetes_analysis.ipynb      # Notebook de análise
