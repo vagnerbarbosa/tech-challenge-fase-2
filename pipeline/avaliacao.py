@@ -134,9 +134,6 @@ def interpretar_melhor_modelo(melhor_modelo, X_teste_df, nomes_features):
     """
     Realiza a interpretação do melhor modelo utilizando Importância das Features e SHAP.
     """
-    
-    print("\n\n=== 🔎 INTERPRETAÇÃO DO MELHOR MODELO ===")
-
     # 1. IMPORTÂNCIA DAS FEATURES 
     if hasattr(melhor_modelo, 'feature_importances_'):
         importancias = melhor_modelo.feature_importances_
@@ -155,11 +152,11 @@ def interpretar_melhor_modelo(melhor_modelo, X_teste_df, nomes_features):
         
         if type(melhor_modelo).__name__ in ['LGBMClassifier', 'RandomForestClassifier', 'DecisionTreeClassifier']:
             # Desativa a checagem de aditividade (necessário para LightGBM)
-            explainer = shap.TreeExplainer(melhor_modelo, check_additivity=False)
+            explainer = shap.TreeExplainer(melhor_modelo)
         else:
             explainer = shap.Explainer(melhor_modelo, X_teste_df) 
 
-        shap_values = explainer.shap_values(X_teste_df)
+        shap_values = explainer.shap_values(X_teste_df, check_additivity=False)
         
         if isinstance(shap_values, list):
             shap_values = shap_values[1] 
@@ -217,24 +214,79 @@ def gerar_explicacao_llm(melhor_modelo, nome_melhor_modelo, X_teste_df, y_teste,
     if CHAMADA_LLM_ATIVA:
         # --- LÓGICA DE PROMPT ENGINEERING REAL (Gemini API) ---
         prompt_texto = f"""
-        Você é um assistente médico especialista. Analise o desempenho e os fatores de risco (features) do modelo de diagnóstico de diabetes.
-        
-        Modelo: {nome_melhor_modelo}
-        
-        Métricas de Desempenho:
-        - Recall (Sensibilidade): {recall:.2f}
-        - F1-score: {f1:.2f}
-        - Acurácia: {acuracia:.2f}
-        
-        Fatores de Risco (Importância SHAP/Clássica):
-        1. {top_features[0]}
-        2. {top_features[1]}
-        3. {top_features[2]}
-        
-        Gere um relatório estruturado em linguagem natural. A análise deve focar em:
-        1. Um resumo da performance do modelo, com ênfase no Alto Recall.
-        2. Insights Clínicos Acionáveis: O que o médico deve fazer para cada um dos 3 fatores de risco.
-        """
+Você é um consultor médico especializado em diagnóstico de diabetes. Sua missão é traduzir os resultados de um sistema de inteligência artificial para uma linguagem clara e acionável para médicos clínicos.
+
+**Contexto do Sistema de Diagnóstico:**
+O sistema "{nome_melhor_modelo}" foi desenvolvido para identificar pacientes com risco de diabetes tipo 2, priorizando a detecção precoce de casos positivos.
+
+**Resultados Obtidos:**
+
+1. **Taxa de Detecção de Casos Positivos:** {recall*100:.1f}%
+   - Isso significa que, de cada 100 pacientes que realmente têm diabetes, o sistema identificou corretamente {int(recall*100)} deles.
+   - Os {int((1-recall)*100)} casos restantes não foram detectados pelo sistema e requerem avaliação clínica adicional.
+
+2. **Equilíbrio entre Detecção e Precisão (F1-Score):** {f1*100:.1f}%
+   - Esta métrica balanceia a capacidade de detectar diabéticos verdadeiros com a taxa de alarmes falsos.
+
+3. **Acurácia Geral do Sistema:** {acuracia*100:.1f}%
+   - De todos os diagnósticos realizados, {int(acuracia*100)}% estavam corretos.
+
+**Principais Fatores Clínicos que Influenciam o Diagnóstico:**
+
+O sistema identificou os seguintes marcadores como os mais relevantes para determinar o risco de diabetes:
+
+1. **{top_features[0]}** (Fator de maior impacto)
+2. **{top_features[1]}** (Segundo fator mais relevante)
+3. **{top_features[2]}** (Terceiro fator mais relevante)
+
+---
+
+**INSTRUÇÕES PARA O RELATÓRIO:**
+
+Por favor, gere um relatório médico estruturado nos seguintes moldes:
+
+**SEÇÃO 1 - AVALIAÇÃO DO DESEMPENHO DO SISTEMA (2-3 parágrafos)**
+- Explique em linguagem clara o que significa detectar {recall*100:.1f}% dos casos positivos
+- Contextualize por que priorizamos a **detecção máxima de diabéticos** (mesmo gerando alguns falsos positivos)
+- Mencione o trade-off: maior detecção pode significar mais exames confirmatórios (como HbA1c) para pacientes saudáveis
+- Não use termos estatísticos como f-1 score, recall, etc. Use linguagem médica acessível e explique os conceitos por trás das métricas se necessário
+
+**SEÇÃO 2 - INTERPRETAÇÃO CLÍNICA DOS FATORES DE RISCO**
+
+Para cada um dos 3 fatores listados acima, forneça:
+
+A) **O que este fator representa clinicamente**
+   - Explique em termos fisiopatológicos simples (exemplo: "níveis elevados de glicose plasmática indicam resistência à insulina")
+
+B) **Por que este fator é crítico para o diagnóstico**
+   - Relate a relação causal com diabetes tipo 2
+
+C) **Ações práticas recomendadas para o médico**
+   - O que fazer quando o paciente apresenta valores elevados/anormais neste fator
+   - Exemplos: "Solicitar teste oral de tolerância à glicose (TOTG)" ou "Encaminhar para nutricionista para plano de redução de peso"
+
+**SEÇÃO 3 - PROTOCOLO DE DECISÃO CLÍNICA**
+
+- Sugira um **fluxograma de decisão** em 3 etapas:
+  1. **Triagem pelo Sistema**: Paciente recebe score de risco
+  2. **Avaliação dos Fatores Críticos**: Médico revisa os 3 fatores principais
+  3. **Confirmação Laboratorial**: Exames complementares (HbA1c, glicemia de jejum)
+
+**SEÇÃO 4 - LIMITAÇÕES E RECOMENDAÇÕES**
+
+- Mencione que {int((1-recall)*100)}% dos casos positivos podem não ser detectados
+- Reforce a necessidade de **julgamento clínico** em casos limítrofes
+- Explique que o sistema é uma **ferramenta de apoio**, não substitui a avaliação médica
+
+---
+
+**FORMATO DE SAÍDA:**
+- Use linguagem técnica médica (evite jargões de machine learning como "recall", "features", "modelo")
+- Estruture em seções numeradas e tópicos
+- Use exemplos práticos quando possível
+- Mantenha tom profissional, mas acessível
+- Limite a 600-800 palavras
+"""
         
         try:
             response = client.models.generate_content(

@@ -34,14 +34,12 @@ def principal():
     )
     
     if melhor_modelo_baseline:
-        print("\n--- 🔎 INTERPRETAÇÃO DO MELHOR MODELO BASELINE ---")
         avaliacao.interpretar_melhor_modelo(melhor_modelo_baseline, X_teste_df, nomes_features)
-    # ==========================================================
-
 
     # ==========================================================
     # FASE 2: OTIMIZAÇÃO POR AG E INTERPRETAÇÃO LLM
     # ==========================================================
+    
     print("\n\n=== 🧬 FASE 2: OTIMIZAÇÃO POR ALGORITMOS GENÉTICOS (AG) ===")
 
     # 5. Otimização e Treinamento do Random Forest Otimizado (AG Real + Limiar Otimizado)
