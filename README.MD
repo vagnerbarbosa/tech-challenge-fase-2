@@ -144,7 +144,7 @@ tech-challenge-fase-2/
 ## 👯 Contribuidores
 
 - [Adriel Santos](https://github.com/AdrielCandido)
-- [João Marcos](https://github.com/github)
+- [João Marcos](https://github.com/joaomarcos999)
 - [Leticia Nepomucena](https://github.com/LeticiaNepomucena)
 - [Lucas Silva](https://github.com/lucfsilva)
 - [Vagner Barbosa](https://github.com/vagnerbarbosa)
