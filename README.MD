@@ -13,7 +13,7 @@ O objetivo principal do projeto é:
 
 ---
 ## 🎞️ Vídeo de Demonstração
-https://youtu.be/d62wPNKj1TU?si=My-jKimrJMECClqP
+https://www.youtube.com/watch?v=y4X2muih5Hs
 
 ## 🚀 Como Executar Localmente
 
